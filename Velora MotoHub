@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrabBike · Motorcycle Ride + Teachable Machine Image</title>
+  <meta name="description" content="Demo motorcycle ride experience powered by Teachable Machine Image library. Easy access to the official Google Creative Lab library with practical examples for ride-hailing safety and recognition." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --surface: #141820;
+      --surface-2: #1c2230;
+      --border: #2a3142;
+      --text: #f0f2f7;
+      --text-muted: #9ba3b5;
+      --accent: #00b14f;          /* Grab green */
+      --accent-hover: #00c853;
+      --blue: #4285f4;
+      --orange: #ff6d00;
+      --radius: 14px;
+      --shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* ========== HERO ========== */
+    .hero {
+      background: linear-gradient(160deg, #0f1a14 0%, #0b0d12 55%, #0d1118 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 56px 0 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -15%;
+      width: 55%;
+      height: 160%;
+      background: radial-gradient(circle, rgba(0,177,79,0.14) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid;
+    }
+    .badge-green {
+      background: rgba(0,177,79,0.15);
+      color: #5ee08a;
+      border-color: rgba(0,177,79,0.35);
+    }
+    .badge-blue {
+      background: rgba(66,133,244,0.12);
+      color: #8ab4f8;
+      border-color: rgba(66,133,244,0.3);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+    h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-bottom: 32px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #fff;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,177,79,0.35);
+    }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: #252c3c;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* ========== MAIN ========== */
+    main { padding: 48px 0 80px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card p { color: var(--text-muted); margin-bottom: 12px; }
+    .card ul { padding-left: 20px; color: var(--text-muted); }
+    .card li { margin-bottom: 7px; }
+
+    .icon { width: 22px; height: 22px; flex-shrink: 0; }
+
+    /* Official URL box */
+    .official {
+      background: linear-gradient(135deg, #121a16 0%, #141820 100%);
+      border: 1px solid rgba(0,177,79,0.35);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .official h2 { color: #5ee08a; font-size: 1.15rem; margin-bottom: 8px; }
+    .url-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 13px 16px;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      word-break: break-all;
+    }
+    .url-box a { color: #8ab4f8; flex: 1; min-width: 0; }
+    .copy-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .copy-btn:hover { background: #2a3142; }
+
+    /* Grid */
+    .grid-2 {
+      display: grid;
+      gap: 24px;
+    }
+    @media (min-width: 780px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Ride features */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .feature {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      transition: border-color 0.2s;
+    }
+    .feature:hover { border-color: var(--accent); }
+    .feature h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+
+    /* Code */
+    pre {
+      background: #0a0c10;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      margin: 12px 0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88em;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    pre code { background: none; padding: 0; }
+
+    /* Steps */
+    .steps { counter-reset: step; }
+    .step {
+      position: relative;
+      padding-left: 48px;
+      margin-bottom: 26px;
+    }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0; top: 0;
+      width: 32px; height: 32px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .step h3 { font-size: 1.05rem; margin-bottom: 5px; }
+    .step p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+    /* Quick links */
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .quick-link:hover {
+      border-color: var(--accent);
+      background: #1f2a22;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .quick-link span { font-size: 0.9rem; font-weight: 500; }
+
+    .warning {
+      background: rgba(255,109,0,0.1);
+      border: 1px solid rgba(255,109,0,0.3);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.9rem;
+      color: #ffb74d;
+      margin-top: 16px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(0,177,79,0.15);
+      color: #5ee08a;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="badge-row">
+        <span class="badge badge-green">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 17h14v2H5z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="8.5" cy="17" r="1.5"/><circle cx="15.5" cy="17" r="1.5"/></svg>
+          Motorcycle Ride
+        </span>
+        <span class="badge badge-blue">
+          Powered by Teachable Machine
+        </span>
+      </div>
+
+      <h1>GrabBike <span>Motorcycle</span><br>Ride Experience</h1>
+      <p class="hero-sub">
+        A modern motorcycle ride-hailing concept that leverages Google’s Teachable Machine Image library 
+        for smarter, safer recognition — helmet checks, vehicle type, and more.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          Official Library on GitHub
+        </a>
+        <a class="btn btn-secondary" href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener">
+          Train Your Own Model
+        </a>
+        <a class="btn btn-secondary" href="#how-it-works">
+          How It Works
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Official URL -->
+    <section class="official">
+      <h2>Official Teachable Machine Image Library</h2>
+      <p style="color: var(--text-muted); margin: 0;">
+        This is the canonical source for the Image library used in this motorcycle ride concept. 
+        All documentation, source code, and examples live here.
+      </p>
+      <div class="url-box">
+        <a id="repo-url" href="https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image" target="_blank" rel="noopener">
+          https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+        </a>
+        <button class="copy-btn" onclick="copyUrl()">Copy link</button>
+      </div>
+    </section>
+
+    <!-- About the concept -->
+    <section class="card">
+      <h2>
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        About This Motorcycle Ride Concept
